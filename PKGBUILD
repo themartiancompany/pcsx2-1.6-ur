@@ -30,6 +30,11 @@
 _arch="$( \
   uname \
     -m)"
+if [[ "${_arch}" == "i686" ]]; then
+  _gcc="gcc"
+elif [[ "${_arch}" == "x86_64" ]]; then
+  _gcc="gcc-multilib"
+fi
 _pkg=pcsx2
 _Pkg="PCSX2"
 pkgname="${_pkg}-1.6"
@@ -53,45 +58,45 @@ license=(
   'LGPL2.1'
   'LGPL3'
 )
-# Im using the reported 'i686' deps
-# really hoping v1.6.0 doesnt really
-# needs multilib
-depends=(
+_depends=(
   'glew'
   'libaio'
   'libcanberra'
   'libjpeg-turbo'
-  # 'nvidia-cg-toolkit'
+  'nvidia-cg-toolkit'
   'portaudio'
   'sdl2'
   'soundtouch'
   'wxgtk'
 )
-# depends_x86_64=(
-#   'lib32-glew'
-#   'lib32-libaio'
-#   'lib32-libcanberra'
-#   'lib32-libjpeg-turbo'
-#   'lib32-nvidia-cg-toolkit'
-#   'lib32-portaudio'
-#   'lib32-sdl2'
-#   'lib32-soundtouch'
-#   'lib32-wxgtk'
-# )
+# My girsh it really requires multilib.
+depends=()
+for _depend in "${_depends[@]}"; do
+  if [[ "${_arch}" == "x86_64" ]]; then
+    _depend="lib32-${_depend}"
+  fi
+  depends+=(
+    "${_depend}"
+  )
+done
 makedepends=(
   'cmake'
   'png++'
+  "${_gcc}"
 )
-makedepends=(
-  'gcc'
+_optdepends+=(
+  'gtk-engines: GTK2 engines support'
+  'gtk-engine-unico: Unico GTK2 engine support'
 )
-# makedepends_x86_64=(
-#   'gcc-multilib'
-# )
-# optdepends_x86_64=(
-#   'lib32-gtk-engines: GTK2 engines support'
-#   'lib32-gtk-engine-unico: Unico GTK2 engine support'
-# )
+optdepends=()
+for _optdepend in "${_optdepends[@]}"; do
+  if [[ "" == "x86_64" ]]; then
+    _optdepend="lib32-${_optdepend}"
+  fi
+  optdepends+=(
+    "${_optdepend}"
+  )
+done
 options=(
   '!emptydirs'
 )
@@ -150,13 +155,13 @@ build() {
     # multilib, lets test without for
     # now.
     _cmake_opts+=(
-      # -DCMAKE_TOOLCHAIN_FILE="cmake/linux-compiler-i386-multilib.cmake"
+      -DCMAKE_TOOLCHAIN_FILE="cmake/linux-compiler-i386-multilib.cmake"
       # This should be fixed in 
       # https://github.com/PCSX2/pcsx2/issues/1933
       # -DwxWidgets_CONFIG_EXECUTABLE="/usr/bin/wx-config32"
     )
-    # _cmake_library_path+="32"
-    # _plugin_dir="/usr/lib32/${_pkg}"
+    _cmake_library_path+="32"
+    _plugin_dir="/usr/lib32/${_pkg}"
   fi
   _cmake_opts+=(
     -DCMAKE_LIBRARY_PATH="${_cmake_library_path}"
