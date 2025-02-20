@@ -100,21 +100,19 @@ _ns="${_Pkg}"
 _url="${_http}/${_ns}/${_pkg}"
 source=(
   "${_pkg}-${pkgver}.tar.gz::${_url}/archive/v${pkgver}.tar.gz"
-  "${_pkg}-gcc6.patch"
 )
 sha256sums=(
-  '2c8a986e2b6514d7018f6cfd39c4f2a72229b9b4ab06ca6b1d3466dfd9c33005'
-  'd78c63808a609a249ec7e8330eeabee306a55ee08d2c9ce9c383b46b334bf7d0'
+  'c09914020e494640f187f46d017f9d142ce2004af763b9a6c5c3a9ea09e5281c'
 )
 
 prepare() {
   cd \
     "${_pkg}-${pkgver}"
   # Fix build with GCC 6
-  patch \
-    -p1 \
-    -i \
-    "../pcsx2-gcc6.patch"
+  # patch \
+  #   -p1 \
+  #   -i \
+  #   "../pcsx2-gcc6.patch"
 }
 
 _usr_get() {
