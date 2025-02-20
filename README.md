@@ -1,4 +1,4 @@
-# `pcsx2-1.7`
+# `pcsx2-1.6`
 
 universal recipe for [user repo](../themartiancompany/ur).
 

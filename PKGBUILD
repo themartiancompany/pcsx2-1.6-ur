@@ -23,246 +23,98 @@
 # Maintainer: Truocolo <truocolo@0x6E5163fC4BFc1511Dbe06bB605cc14a3e462332b>
 # Maintainer: Pellegrino Prevete (dvorak) <pellegrinoprevete@gmail.com>
 # Maintainer: Pellegrino Prevete (dvorak) <dvorak@0x87003Bd6C074C713783df04f36517451fF34CBEf>
-# Maintainer: éclairevoyant
-# Contributor: rafaelff <rafaelff at gnome dot org>
-# Contributor: WeirdBeard <obarrtimothy at gmail dot com>
-# Contributor: Themaister <maister at archlinux dot us>
-# Contributor: Maxime Gauduin <alucryd at archlinux dot org>
-# Contributor: josephgbr <rafael dot f dot f1 at gmail dot com>
-# Contributor: vEX <vex at niechift dot com>
+# Maintainer: Maxime Gauduin <alucryd@archlinux.org>
+# Contributor: josephgbr <rafael.f.f1@gmail.com>
+# Contributor: vEX <vex@niechift.com>
 
-_os="$( \
+_arch="$( \
   uname \
-    -o)"
-_clang="true"
-_avx="false"
-if [[ "${_clang}" == "true" ]]; then
-  _cc="clang"
-  _cxx="clang++"
-  _ld="lld"
-fi
-_wayland="true"
-if [[ "${_os}" == "GNU/Linux" ]]; then
-  _libc="glibc"
-elif [[ "${_os}" == "Android" ]]; then
-  _libc="ndk-sysroot"
-  _wayland="false"
-fi
-_git="true"
+    -m)"
 _pkg=pcsx2
 _Pkg="PCSX2"
-pkgname="${_pkg}-1.7"
-pkgver="1.7.4592"
-_commit="b6923f49b159303bd3a2281021d22cdb6b8ea308"
-_ffmpeg_ver="6.1"
-_fmt_ver="8"
-# pkgver="2.2"
-#_commit="2d5faa627ff54f3fb2a69a43286181bee071a1c3"
+pkgname="${_pkg}-1.6"
+pkgver=1.6.0
 pkgrel=1
 pkgdesc='A Sony PlayStation 2 emulator'
 arch=(
+  'i686'
   'x86_64'
   'arm'
-  'aarch64'
-  'mips'
-  'i686'
-  'pentium4'
   'armv7l'
+  'aarch64'
+  'armv6l'
   'powerpc'
+  'pentium4'
 )
-url="https://www.${_pkg}.net"
+url="http://www.${_pkg}.net"
 license=(
   'GPL2'
   'GPL3'
   'LGPL2.1'
   'LGPL3'
 )
+# Im using the reported 'i686' deps
+# really hoping v1.6.0 doesnt really
+# needs multilib
 depends=(
-  "ffmpeg<7"
-  "${_libc}"
-  'libaio.so'
-  'libgl'
-  'libharfbuzz.so'
-  'libpcap.so'
-  'libpng'
-  'libudev.so'
-  'libx11'
-  'libxcb'
-  'libxrandr'
-  'libzstd.so'
-  'qt6-base'
-  'qt6-svg'
+  'glew'
+  'libaio'
+  'libcanberra'
+  'libjpeg-turbo'
+  # 'nvidia-cg-toolkit'
+  'portaudio'
   'sdl2'
-  # new now-removed dependency
-  # 'shaderc-non-semantic-debug'
   'soundtouch'
-  'xz'
-  'zlib'
+  'wxgtk'
 )
-if [[ "${_wayland}" == "true" ]]; then
-  depends+=(
-    'wayland'
-  )
-  makedepends+=(
-    'qt6-wayland'
-  )
-fi
-# this specific version dependencies
-depends+=(
-  'libasound.so'
-  "libfmt.so=${_fmt_ver}"
-  'libsamplerate.so'
-  'libzip.so'
+# depends_x86_64=(
+#   'lib32-glew'
+#   'lib32-libaio'
+#   'lib32-libcanberra'
+#   'lib32-libjpeg-turbo'
+#   'lib32-nvidia-cg-toolkit'
+#   'lib32-portaudio'
+#   'lib32-sdl2'
+#   'lib32-soundtouch'
+#   'lib32-wxgtk'
+# )
+makedepends=(
+  'cmake'
+  'png++'
 )
 makedepends=(
-  "${_cc}"
-  'cmake'
-  # new dependency not currently needed
-  # 'extra-cmake-modules'
-  # new dependency
-  # 'libpipewire'
-  'libpulse'
-  "${_ld}"
-  'llvm'
-  'ninja'
-  'p7zip'
-  'qt6-tools'
+  'gcc'
 )
-optdepends=(
-  'qt6-wayland: Wayland support'
-  'libpipewire: Pipewire support'
-  'libpulse: PulseAudio support'
-)
-provides+=(
-  "${_pkg}=${pkgver}"
-)
-_tag_name="commit"
-_tag="${_commit}"
+# makedepends_x86_64=(
+#   'gcc-multilib'
+# )
+# optdepends_x86_64=(
+#   'lib32-gtk-engines: GTK2 engines support'
+#   'lib32-gtk-engine-unico: Unico GTK2 engine support'
+# )
 options=(
-  !lto
+  '!emptydirs'
 )
 _http="https://github.com"
 _ns="${_Pkg}"
 _url="${_http}/${_ns}/${_pkg}"
-if [[ "${_git}" == "true" ]]; then
-  makedepends+=(
-    "git"
-  )
-  source=(
-    "git+${_url}.git#${_tag_name}=${_tag}"
-    "git+${_http}/${_ns}/${_pkg}_patches.git"
-    "git+${_http}/google/googletest.git"
-    "git+${_http}/fmtlib/fmt.git"
-    "git+${_http}/biojppm/rapidyaml.git"
-    "git+${_http}/biojppm/cmake.git"
-    "git+${_http}/biojppm/c4core.git"
-    "git+${_http}/biojppm/debugbreak.git"
-    "git+${_http}/fastfloat/fast_float.git"
-    "vulkan-headers::git+${_http}/KhronosGroup/Vulkan-Headers.git"
-  )
-  # This version extra sources
-  source+=(
-    "git+${_http}/rtissera/libchdr.git"
-    "git+${_http}/KhronosGroup/glslang.git"
-    "xz-pcsx2::git+${_http}/${_ns}/xz.git"
-    "git+${_http}/nih-at/libzip.git"
-    "git+${_http}/facebook/zstd.git"
-    "git+${_http}/RetroAchievements/rcheevos.git"
-  )
-  b2sums=(
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-  )
-  # This version extra sums
-  b2sums+=(
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-  )
-fi
-install="${_pkg}.install"
-
-_git_submodule_update() {
-  local \
-    _path="${1}" \
-    _url="${2}"
-  git \
-    submodule \
-      init \
-        "${_path}"
-  git \
-    submodule \
-      set-url \
-        "${_path}" \
-        "${_url}"
-  git \
-    -c \
-      protocol.file.allow="always" \
-    submodule \
-      update \
-        "${_path}"
-}
+source=(
+  "${_pkg}-${pkgver}.tar.gz::${_url}/archive/v${pkgver}.tar.gz"
+  "${_pkg}-gcc6.patch"
+)
+sha256sums=(
+  '2c8a986e2b6514d7018f6cfd39c4f2a72229b9b4ab06ca6b1d3466dfd9c33005'
+  'd78c63808a609a249ec7e8330eeabee306a55ee08d2c9ce9c383b46b334bf7d0'
+)
 
 prepare() {
-  local \
-    _submodule
   cd \
-    "${_pkg}"
-  _pcsx2_submodules=(
-    "googletest::3rdparty/gtest"
-    "fmt::3rdparty/fmt/fmt"
-    "rapidyaml::3rdparty/rapidyaml/rapidyaml"
-    "vulkan-headers::3rdparty/vulkan-headers"
-    # Extra submodules for this version
-    "xz-pcsx2::3rdparty/xz/xz"
-    "glslang::3rdparty/glslang/glslang"
-    "libchdr::3rdparty/libchdr/libchdr"
-    "libzip::3rdparty/libzip/libzip"
-    "zstd::3rdparty/zstd/zstd"
-    "rcheevos::3rdparty/rcheevos/rcheevos"
-  )
-  # must be done this way due to recursive submodules
-  for _submodule \
-    in ${_pcsx2_submodules[@]}; do
-    _git_submodule_update \
-      "${_submodule#*::}" \
-      "${srcdir}/${_submodule%::*}"
-  done
-  cd \
-    "3rdparty/rapidyaml/rapidyaml"
-  for _submodule in "ext/c4core"; do
-    _git_submodule_update \
-      "${_submodule}" \
-      "${srcdir}/${_submodule##*/}"
-  done
-  cd \
-    "ext/c4core"
-  for _submodule \
-    in "cmake" "src/c4/ext/"{"debugbreak","fast_float"}; do
-    _git_submodule_update \
-      "${_submodule}" \
-      "${srcdir}/${_submodule##*/}"
-  done
-}
-
-pkgver() {
-  git \
-    -C "${_pkg}" \
-    describe \
-      --tags | \
-    sed \
-      's/^v//'
+    "${_pkg}-${pkgver}"
+  # Fix build with GCC 6
+  patch \
+    -p1 \
+    -i \
+    "../pcsx2-gcc6.patch"
 }
 
 _usr_get() {
@@ -280,142 +132,60 @@ _usr_get() {
 build() {
   local \
     _cmake_opts=() \
-    _cxxflags=() \
-    _wayland_api \
-    _avx_disabled \
-    _ffmpeg_include \
-    _ffmpeg_libs \
-    _fmt_include \
-    _fmt_libs \
-    _cmake_include_dirs=() \
-    _cmake_libs_dirs=() \
-    _cmake_cxx_flags=() \
-    _ldflags=()
-  _ffmpeg_include="$( \
-    _usr_get)/include/ffmpeg${_ffmpeg_ver}"
-  _fmt_include="$( \
-    _usr_get)/include/fmt${_fmt_ver}"
-  _ffmpeg_libs="$( \
-    _usr_get)/lib/ffmpeg${_ffmpeg_ver}"
-  _fmt_libs="$( \
-    _usr_get)/lib/fmt${_fmt_ver}"
-  _libfmt="${_fmt_libs}/libfmt.so"
-  # Cmake is damn weird
-  _cmake_include_dirs+=(
-    -I"${_ffmpeg_include}"
-    -I"${_fmt_include}"
+    _plugin_dir \
+    _cmake_library_path
+  _cmake_opts+=(
+    -DCMAKE_BUILD_TYPE='Release'
+    -DCMAKE_INSTALL_PREFIX='/usr'
+    -DGAMEINDEX_DIR="/usr/share/${_pkg}"
+    -DDISABLE_ADVANCE_SIMD='TRUE'
+    -DEXTRA_PLUGINS='TRUE'
+    -DREBUILD_SHADER='TRUE'
+    -DGLSL_API='TRUE'
+    -DPACKAGE_MODE='TRUE'
+    -DXDG_STD='TRUE'
   )
-  _ldflags+=(
-    $LDFLAGS
-    -fuse-ld=${_ld}
-    -L"${_ffmpeg_libs}"
-    -L"${_fmt_libs}"
-    -lfmt
-    "${_libfmt}"
-  )
-  _cmake_libs_dirs+=(
-    # -L"${_ffmpeg_libs}"
-    # -L"${_fmt_libs}"
-  )
-  _cmake_cxx_flags+=(
-    "${_cmake_include_dirs[@]}"
-    "${_cmake_libs_dirs[@]}"
-  )
-  _cxxflags=(
-    $CXXFLAGS
-  )
-  if [[ "${_clang}" == "true" ]]; then
-    _cxxflags+=(
-      -Wp,-D_FORTIFY_SOURCE=0
-      -Wno-deprecated-declarations
-      -Wl,"${_libfmt}"
-      "${_cmake_cxx_flags[@]}"
+  _plugin_dir="/usr/lib/${_pkg}"
+  _cmake_library_path="/usr/lib"
+  if [[ "${_arch}" == "x86_64" ]]; then
+    # I dont know if it really needs
+    # multilib, lets test without for
+    # now.
+    _cmake_opts+=(
+      # -DCMAKE_TOOLCHAIN_FILE="cmake/linux-compiler-i386-multilib.cmake"
+      # This should be fixed in 
+      # https://github.com/PCSX2/pcsx2/issues/1933
+      # -DwxWidgets_CONFIG_EXECUTABLE="/usr/bin/wx-config32"
     )
-  fi
-  if [[ "${_wayland}" == "true" ]]; then
-    _wayland_api="ON"
-  elif [[ "${_wayland}" == "false" ]]; then
-    _wayland_api="OFF"
-  fi
-  if [[ "${_avx}" == "true" ]]; then
-    _avx_disabled="FALSE"
-  elif [[ "${_avx}" == "false" ]]; then
-    _avx_disabled="TRUE"
+    # _cmake_library_path+="32"
+    # _plugin_dir="/usr/lib32/${_pkg}"
   fi
   _cmake_opts+=(
-    -S
-      "${_pkg}"
-    -B
-      "build"
-    -G
-      "Ninja"
-    -DCMAKE_C_COMPILER="${_cc}"
-    -DCMAKE_CXX_COMPILER="${_cxx}"
-    -DCMAKE_EXE_LINKER_FLAGS_INIT="${_ldflags[*]}"
-    -DCMAKE_MODULE_LINKER_FLAGS_INIT="${_ldflags[*]}"
-    -DCMAKE_SHARED_LINKER_FLAGS_INIT="${_ldflags[*]}"
-    -DCMAKE_INTERPROCEDURAL_OPTIMIZATION="ON"
-    -DCMAKE_BUILD_TYPE="Release"
-    -DX11_API="ON"
-    -DWAYLAND_API="${_wayland_api}"
-    -DENABLE_SETCAP="OFF"
-    -DDISABLE_ADVANCE_SIMD="${_avx_disabled}"
-    -DCMAKE_INSTALL_PREFIX="/usr"
-    -DCMAKE_CXX_FLAGS="${_cxxflags[*]}"
-    -DFFMPEG_INCLUDE_DIRS="${_ffmpeg_include}"
-    -DFFMPEG_LIBRARIES="${_ffmpeg_libs}"
+    -DCMAKE_LIBRARY_PATH="${_cmake_library_path}"
+    -DPLUGIN_DIR="${_plugin_dir}"
   )
-  # 7zip the patches
-  pushd \
-    "pcsx2_patches"
-  7z \
-    a \
-    -r \
-    "${srcdir}/patches.zip" \
-    "patches/."
-  popd
-  # see .github/workflows/scripts/linux/generate-cmake-qt.sh
-  CXXFLAGS="${_cxxflags[*]}" \
-  LDFLAGS="${_ldflags[*]}" \
-  cmake \
+  cd \
+    "${_pkg}-${pkgver}"
+  if [[ -d build ]]; then
+    rm \
+      -rf \
+      "build"
+  fi
+  mkdir \
+    "build"
+  cd \
+    "build"
+  cmake .. \
     "${_cmake_opts[@]}"
-  CXXFLAGS="${_cxxflags[*]}" \
-  LDFLAGS="${_ldflags[*]}" \
-  ninja \
-    -C "build" \
-    -v
+  make
 }
 
 package() {
-  install \
-    -Dm644 \
-    "patches.zip" \
-    -t \
-    "${pkgdir}/opt/${pkgname}/resources/"
-  cp \
-    -r \
-    "build/bin/"* \
-    "${pkgdir}/opt/${pkgname}/"
-  install \
-    -Dm755 \
-    "/dev/stdin" \
-    "${pkgdir}/usr/bin/${_pkg}-qt" <<eof
-#!/usr/bin/env sh
-/opt/${pkgname}/${_pkg}-qt "\$@"
-eof
   cd \
-    "${_pkg}"
-  install \
-    -Dm644 \
-    ".github/workflows/scripts/linux/${_pkg}-qt.desktop" \
-    -t \
-    "${pkgdir}/usr/share/applications/"
-  sed \
-    "s/Icon=${_Pkg}/Icon=${pkgname}/" \
-    -i \
-    "${pkgdir}/usr/share/applications/${_pkg}-qt.desktop"
-  install \
-    -Dm644 \
-    "bin/resources/icons/AppIconLarge.png" \
-    "${pkgdir}/usr/share/icons/hicolor/64x64/apps/${pkgname}.png"
+    "${_pkg}-${pkgver}/build"
+  make \
+    DESTDIR="${pkgdir}" \
+    install
 }
+
+# vim: ts=2 sw=2 et:
