@@ -36,7 +36,7 @@ if [[ "${_arch}" == "i686" ]]; then
 elif [[ "${_arch}" == "x86_64" ]]; then
   _gcc="gcc-multilib"
 fi
-_gtk_ver="3"
+_gtk_ver="2"
 _pkg=pcsx2
 _Pkg="PCSX2"
 pkgname="${_pkg}-1.6"
@@ -176,8 +176,6 @@ build() {
     -I"${_wx_gtk_unicode_include}"
     $(find \
         "${_wx_libs}" \
-        -type \
-          "f" \
         -iname \
           "*.so" \
         -exec \
@@ -190,8 +188,6 @@ build() {
     -L"${_gtk_libs}"
     $(find \
         "${_wx_libs}" \
-        -type \
-          "f" \
         -iname \
           "*.so")
   )
@@ -219,6 +215,7 @@ build() {
     -DCMAKE_MODULE_LINKER_FLAGS_INIT="${_ldflags[*]}"
     -DCMAKE_SHARED_LINKER_FLAGS_INIT="${_ldflags[*]}"
     -DwxWidgets_LIBRARIES="${_wx_libs}"
+    # --trace
   )
   _plugin_dir="/usr/lib/${_pkg}"
   _cmake_library_path="/usr/lib"
@@ -257,13 +254,15 @@ build() {
     "${_cmake_opts[@]}"
   CXXFLAGS="${_cxxflags[*]}" \
   LDFLAGS="${_ldflags[*]}" \
-  make
+  make \
+    VERBOSE=1
 }
 
 package() {
   cd \
     "${_tarname}/build"
   make \
+    VERBOSE=1 \
     DESTDIR="${pkgdir}" \
     install
 }
