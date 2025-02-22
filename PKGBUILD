@@ -134,6 +134,10 @@ prepare() {
     "/#include \"svnrev.h\"/a #include <stdexcept>" \
     -i \
     "plugins/cdvdGigaherz/src/CDVD.cpp"
+  sed \
+    "/#include \"svnrev.h\"/a #include <system_error>" \
+    -i \
+    "plugins/cdvdGigaherz/src/CDVD.cpp"
   # Fix build with GCC 6
   # patch \
   #   -p1 \
