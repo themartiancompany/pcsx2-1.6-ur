@@ -130,6 +130,10 @@ prepare() {
     "s%\"/usr/bin/wx-config-3.0\"%\"/usr/bin/wx-config32-gtk${_gtk_ver}-3.0\"%" \
     -i \
     "cmake/SearchForStuff.cmake"
+  sed \
+    "/#include \"svnrev.h\"/a #include <stdexcept>" \
+    -i \
+    "plugins/cdvdGigaherz/src/CDVD.cpp"
   # Fix build with GCC 6
   # patch \
   #   -p1 \
