@@ -148,23 +148,26 @@ build() {
     _cmake_opts=() \
     _plugin_dir \
     _cmake_library_path \
-    _wxwidgets_include \
-    _wxwidgets_lib \
+    _wx_include \
+    _wx_gtk2_unicode_include \
+    _wx_lib \
     _cxxflags=() \
     _ldflags=()
-  _wxwidgets_include="$( \
+  _wx_include="$( \
     _usr_get)/include/wx-3.0"
-  _wxwidgets_libs="$( \
+  _wx_libs="$( \
     _usr_get)/lib32/wxwidgets3.0"
+  _wx_gtk2_unicode_include="${_wx_libs}/wx/include/gtk2-unicode-3.0"
   _gtk2_libs="$( \
     _usr_get)/lib32/gtk-2.0"
   _cxxflags+=(
     $CXXFLAGS
-    -I"${_wxwidgets_include}"
+    -I"${_wx_include}"
+    -I"${_wx_gtk2_unicode_include}"
   )
   _ldflags+=(
     $LDFLAGS
-    -L"${_wxwidgets_libs}"
+    -L"${_wx_libs}"
     -L"${_gtk2_libs}"
   )
   _cmake_opts+=(
@@ -181,8 +184,7 @@ build() {
     -DCMAKE_EXE_LINKER_FLAGS_INIT="${_ldflags[*]}"
     -DCMAKE_MODULE_LINKER_FLAGS_INIT="${_ldflags[*]}"
     -DCMAKE_SHARED_LINKER_FLAGS_INIT="${_ldflags[*]}"
-    -DwxWidgets_CONFIG_EXECUTABLE="$(_usr_get)/bin/wx-config32-gtk2-3.0"
-    -DwxWidgets_LIBRARIES="${_wxwidgets_libs}"
+    -DwxWidgets_LIBRARIES="${_wx_libs}"
   )
   _plugin_dir="/usr/lib/${_pkg}"
   _cmake_library_path="/usr/lib"
@@ -192,9 +194,9 @@ build() {
     # now.
     _cmake_opts+=(
       -DCMAKE_TOOLCHAIN_FILE="cmake/linux-compiler-i386-multilib.cmake"
-      # This should be fixed in 
+      # This has never been fixed in 
       # https://github.com/PCSX2/pcsx2/issues/1933
-      # -DwxWidgets_CONFIG_EXECUTABLE="/usr/bin/wx-config32"
+      -DwxWidgets_CONFIG_EXECUTABLE="$(_usr_get)/bin/wx-config32-gtk2-3.0"
     )
     _cmake_library_path+="32"
     _plugin_dir="/usr/lib32/${_pkg}"
