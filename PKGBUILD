@@ -229,13 +229,14 @@ build() {
   )
   if [[ "${_warnings}" == "false" ]]; then
     _cxxflags+=(
-    -Wno-deprecated-copy
-    -Wno-lto-type-mismatch
-    -Wno-maybe-uninitialized
-    -Wno-odr
-    -Wno-cast-user-defined
-    -Wno-implicit-fallthrough
-    -Wno-cast-function-type
+      -Wno-deprecated-copy
+      -Wno-lto-type-mismatch
+      -Wno-maybe-uninitialized
+      -Wno-odr
+      -Wno-cast-user-defined
+      -Wno-implicit-fallthrough
+      -Wno-cast-function-type
+      -Wno-deprecated-declarations
     )
   fi
   _ldflags+=(
