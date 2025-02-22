@@ -130,6 +130,10 @@ prepare() {
     "s%\"/usr/bin/wx-config-3.0\"%\"/usr/bin/wx-config32-gtk${_gtk_ver}-3.0\"%" \
     -i \
     "cmake/SearchForStuff.cmake"
+  # Stupid 'cdvdGigaherz' plugin missing includes
+  # which have caused me to lose hours and hours
+  # of build time.
+  # CDVD missing includes
   sed \
     "/#include \"svnrev.h\"/a #include <stdexcept>" \
     -i \
@@ -138,6 +142,15 @@ prepare() {
     "/#include \"svnrev.h\"/a #include <system_error>" \
     -i \
     "plugins/cdvdGigaherz/src/CDVD.cpp"
+  # ReadThread 
+  sed \
+    "/#include <thread>/a #include <stdexcept>" \
+    -i \
+    "plugins/cdvdGigaherz/src/ReadThread.cpp"
+  sed \
+    "/#include <thread>/a #include <system_error>" \
+    -i \
+    "plugins/cdvdGigaherz/src/ReadThread.cpp"
   # Fix build with GCC 6
   # patch \
   #   -p1 \
