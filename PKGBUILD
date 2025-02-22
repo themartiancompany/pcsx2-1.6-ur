@@ -180,6 +180,9 @@ build() {
   _cxxflags+=(
     $CXXFLAGS
     -Wno-deprecated-copy
+    -Wno-lto-type-mismatch
+    -Wno-maybe-uninitialized
+    -Wno-odr
     -I"${_wx_include}"
     -I"${_wx_gtk_unicode_include}"
     $(find \
