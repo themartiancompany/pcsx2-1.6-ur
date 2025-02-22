@@ -68,7 +68,7 @@ _depends=(
   'portaudio'
   'sdl2'
   'soundtouch'
-  "wxwidgets3.0-gtk3"
+  "wxwidgets3.0-gtk2"
 )
 # My girsh it really requires multilib.
 depends=()
@@ -116,11 +116,11 @@ prepare() {
   cd \
     "${_tarname}"
   sed \
-    "s%\"/usr/bin/wx-config32\"%\"/usr/bin/wx-config32-gtk3-3.0\"%" \
+    "s%\"/usr/bin/wx-config32\"%\"/usr/bin/wx-config32-gtk2-3.0\"%" \
     -i \
     "cmake/SearchForStuff.cmake"
   sed \
-    "s%\"/usr/bin/wx-config-3.0\"%\"/usr/bin/wx-config32-gtk3-3.0\"%" \
+    "s%\"/usr/bin/wx-config-3.0\"%\"/usr/bin/wx-config32-gtk2-3.0\"%" \
     -i \
     "cmake/SearchForStuff.cmake"
   # Fix build with GCC 6
@@ -155,6 +155,8 @@ build() {
     _usr_get)/include/wx-3.0"
   _wxwidgets_libs="$( \
     _usr_get)/lib32/wxwidgets3.0"
+  _gtk2_libs="$( \
+    _usr_get)/lib32/gtk-2.0"
   _cxxflags+=(
     $CXXFLAGS
     -I"${_wxwidgets_include}"
@@ -162,6 +164,7 @@ build() {
   _ldflags+=(
     $LDFLAGS
     -L"${_wxwidgets_libs}"
+    -L"${_gtk2_libs}"
   )
   _cmake_opts+=(
     -DCMAKE_BUILD_TYPE='Release'
@@ -177,7 +180,7 @@ build() {
     -DCMAKE_EXE_LINKER_FLAGS_INIT="${_ldflags[*]}"
     -DCMAKE_MODULE_LINKER_FLAGS_INIT="${_ldflags[*]}"
     -DCMAKE_SHARED_LINKER_FLAGS_INIT="${_ldflags[*]}"
-    -DwxWidgets_CONFIG_EXECUTABLE="$(_usr_get)/bin/wx-config32-gtk3-3.0"
+    -DwxWidgets_CONFIG_EXECUTABLE="$(_usr_get)/bin/wx-config32-gtk2-3.0"
     -DwxWidgets_LIBRARIES="${_wxwidgets_libs}"
   )
   _plugin_dir="/usr/lib/${_pkg}"
