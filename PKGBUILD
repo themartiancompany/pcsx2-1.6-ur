@@ -37,6 +37,7 @@ elif [[ "${_arch}" == "x86_64" ]]; then
   _gcc="gcc-multilib"
 fi
 _ccache="true"
+_warnings="false"
 _gtk_ver="2"
 _pkg=pcsx2
 _Pkg="PCSX2"
@@ -216,10 +217,6 @@ build() {
   _gtk_libs="${_lib32}"
   _cxxflags+=(
     $CXXFLAGS
-    -Wno-deprecated-copy
-    -Wno-lto-type-mismatch
-    -Wno-maybe-uninitialized
-    -Wno-odr
     -I"${_wx_include}"
     -I"${_wx_gtk_unicode_include}"
     $(find \
@@ -230,6 +227,17 @@ build() {
           echo \
             "-Wl,{}" \;)
   )
+  if [[ "${_warnings}" == "false" ]]; then
+    _cxxflags+=(
+    -Wno-deprecated-copy
+    -Wno-lto-type-mismatch
+    -Wno-maybe-uninitialized
+    -Wno-odr
+    -Wno-cast-user-defined
+    -Wno-implicit-fallthrough
+    -Wno-cast-function-type
+    )
+  fi
   _ldflags+=(
     $LDFLAGS
     -L"${_wx_libs}"
