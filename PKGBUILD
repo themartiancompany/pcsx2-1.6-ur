@@ -138,7 +138,7 @@ prepare() {
     "cmake/SearchForStuff.cmake"
   # Stupid 'cdvdGigaherz' plugin missing includes
   # which have caused me to lose hours and hours
-  # of build time.
+  # AND HOURS of build time.
   # CDVD missing includes
   sed \
     "/#include \"svnrev.h\"/a #include <stdexcept>" \
@@ -157,6 +157,14 @@ prepare() {
     "/#include <thread>/a #include <system_error>" \
     -i \
     "plugins/cdvdGigaherz/src/ReadThread.cpp"
+  sed \
+    "/#include <cstring>/a #include <stdexcept>" \
+    -i \
+    "plugins/cdvdGigaherz/src/Unix/LinuxIOCtlSrc.cpp"
+  sed \
+    "/#include <cstring>/a #include <system_error>" \
+    -i \
+    "plugins/cdvdGigaherz/src/Unix/LinuxIOCtlSrc.cpp"
   # Fix build with GCC 6
   # patch \
   #   -p1 \
