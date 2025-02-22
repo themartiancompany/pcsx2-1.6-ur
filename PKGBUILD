@@ -178,6 +178,7 @@ build() {
     -DCMAKE_MODULE_LINKER_FLAGS_INIT="${_ldflags[*]}"
     -DCMAKE_SHARED_LINKER_FLAGS_INIT="${_ldflags[*]}"
     -DwxWidgets_CONFIG_EXECUTABLE="$(_usr_get)/bin/wx-config32-gtk3-3.0"
+    -DwxWidgets_LIBRARIES="${_wxwidgets_libs}"
   )
   _plugin_dir="/usr/lib/${_pkg}"
   _cmake_library_path="/usr/lib"
