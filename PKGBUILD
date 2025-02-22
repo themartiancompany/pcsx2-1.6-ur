@@ -191,16 +191,13 @@ build() {
     _lib32 \
     _gtk_libs \
     _gtk3_api
+  _cc="gcc"
+  _cxx="g++"
   if [[ "${_ccache}" == "true" ]]; then
-    _cc="ccache gcc"
-    _cxx="ccache g++"
     _cmake_opts+=(
       -DCMAKE_C_COMPILER_LAUNCHER="ccache"
       -DCMAKE_CXX_COMPILER_LAUNCHER="ccache"
     )
-  elif [[ "${_ccache}" == "false" ]]; then
-    _cc="gcc"
-    _cxx="g++"
   fi
   _lib32="$( \
     _usr_get)/lib32"
