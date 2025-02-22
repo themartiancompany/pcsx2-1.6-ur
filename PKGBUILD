@@ -36,7 +36,7 @@ if [[ "${_arch}" == "i686" ]]; then
 elif [[ "${_arch}" == "x86_64" ]]; then
   _gcc="gcc-multilib"
 fi
-_gtk_ver="2"
+_gtk_ver="3"
 _pkg=pcsx2
 _Pkg="PCSX2"
 pkgname="${_pkg}-1.6"
