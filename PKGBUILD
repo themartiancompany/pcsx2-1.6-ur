@@ -194,6 +194,10 @@ build() {
   if [[ "${_ccache}" == "true" ]]; then
     _cc="ccache gcc"
     _cxx="ccache g++"
+    _cmake_opts+=(
+      -DCMAKE_C_COMPILER_LAUNCHER="ccache"
+      -DCMAKE_CXX_COMPILER_LAUNCHER="ccache"
+    )
   elif [[ "${_ccache}" == "false" ]]; then
     _cc="gcc"
     _cxx="g++"
@@ -236,8 +240,6 @@ build() {
     _gtk3_api="TRUE"
   fi
   _cmake_opts+=(
-    -DCMAKE_C_COMPILER="${_cc}"
-    -DCMAKE_CXX_COMPILER="${_cxx}"
     -DCMAKE_BUILD_TYPE='Release'
     -DCMAKE_INSTALL_PREFIX='/usr'
     -DGAMEINDEX_DIR="/usr/share/${_pkg}"
