@@ -36,6 +36,7 @@ if [[ "${_arch}" == "i686" ]]; then
 elif [[ "${_arch}" == "x86_64" ]]; then
   _gcc="gcc-multilib"
 fi
+_gtk_ver="2"
 _pkg=pcsx2
 _Pkg="PCSX2"
 pkgname="${_pkg}-1.6"
@@ -71,6 +72,11 @@ _depends=(
   'soundtouch'
   "wxwidgets3.0-gtk2"
 )
+if [[ "${_gtk_ver}" == "3" ]]; then
+  _depends+=(
+    "wxwidgets3.0-gtk3"
+  )
+fi
 # My girsh it really requires multilib.
 depends=()
 for _depend in "${_depends[@]}"; do
@@ -117,11 +123,11 @@ prepare() {
   cd \
     "${_tarname}"
   sed \
-    "s%\"/usr/bin/wx-config32\"%\"/usr/bin/wx-config32-gtk2-3.0\"%" \
+    "s%\"/usr/bin/wx-config32\"%\"/usr/bin/wx-config32-gtk${_gtk_ver}-3.0\"%" \
     -i \
     "cmake/SearchForStuff.cmake"
   sed \
-    "s%\"/usr/bin/wx-config-3.0\"%\"/usr/bin/wx-config32-gtk2-3.0\"%" \
+    "s%\"/usr/bin/wx-config-3.0\"%\"/usr/bin/wx-config32-gtk${_gtk_ver}-3.0\"%" \
     -i \
     "cmake/SearchForStuff.cmake"
   # Fix build with GCC 6
@@ -149,27 +155,51 @@ build() {
     _plugin_dir \
     _cmake_library_path \
     _wx_include \
-    _wx_gtk2_unicode_include \
+    _wx_gtk_unicode_include \
     _wx_lib \
     _cxxflags=() \
-    _ldflags=()
+    _ldflags=() \
+    _lib32 \
+    _gtk_libs \
+    _gtk3_api
+  _lib32="$( \
+    _usr_get)/lib32"
   _wx_include="$( \
     _usr_get)/include/wx-3.0"
-  _wx_libs="$( \
-    _usr_get)/lib32/wxwidgets3.0"
-  _wx_gtk2_unicode_include="${_wx_libs}/wx/include/gtk2-unicode-3.0"
-  _gtk2_libs="$( \
-    _usr_get)/lib32/gtk-2.0"
+  _wx_libs="${_lib32}/wxwidgets3.0"
+  _wx_gtk_unicode_include="${_wx_libs}/wx/include/gtk${_gtk_ver}-unicode-3.0"
+  _gtk_libs="${_lib32}"
   _cxxflags+=(
     $CXXFLAGS
+    -Wno-deprecated-copy
     -I"${_wx_include}"
-    -I"${_wx_gtk2_unicode_include}"
+    -I"${_wx_gtk_unicode_include}"
+    $(find \
+        "${_wx_libs}" \
+        -type \
+          "f" \
+        -iname \
+          "*.so" \
+        -exec \
+          echo \
+            "-Wl,{}" \;)
   )
   _ldflags+=(
     $LDFLAGS
     -L"${_wx_libs}"
-    -L"${_gtk2_libs}"
+    -L"${_gtk_libs}"
+    $(find \
+        "${_wx_libs}" \
+        -type \
+          "f" \
+        -iname \
+          "*.so")
   )
+  if [[ "${_gtk_ver}" == "2" ]]; then
+    _gtk3_api="FALSE"
+  elif [[ "${_gtk_ver}" == "3" ]]; then
+    _gtk3_api="TRUE"
+  fi
   _cmake_opts+=(
     -DCMAKE_BUILD_TYPE='Release'
     -DCMAKE_INSTALL_PREFIX='/usr'
@@ -180,6 +210,10 @@ build() {
     -DGLSL_API='TRUE'
     -DPACKAGE_MODE='TRUE'
     -DXDG_STD='TRUE'
+    -DEGL_API='FALSE'
+		-DGTK3_API="${_gtk3_api}"
+    # Same SDL used to build wx
+    -DSDL2_API='TRUE'
     -DCMAKE_CXX_FLAGS="${_cxxflags[*]}"
     -DCMAKE_EXE_LINKER_FLAGS_INIT="${_ldflags[*]}"
     -DCMAKE_MODULE_LINKER_FLAGS_INIT="${_ldflags[*]}"
@@ -196,10 +230,11 @@ build() {
       -DCMAKE_TOOLCHAIN_FILE="cmake/linux-compiler-i386-multilib.cmake"
       # This has never been fixed in 
       # https://github.com/PCSX2/pcsx2/issues/1933
-      -DwxWidgets_CONFIG_EXECUTABLE="$(_usr_get)/bin/wx-config32-gtk2-3.0"
+      -DwxWidgets_CONFIG_EXECUTABLE="$( \
+        _usr_get)/bin/wx-config32-gtk2-3.0"
     )
-    _cmake_library_path+="32"
-    _plugin_dir="/usr/lib32/${_pkg}"
+    _cmake_library_path+="${_lib32}"
+    _plugin_dir="${_lib32}/${_pkg}"
   fi
   _cmake_opts+=(
     -DCMAKE_LIBRARY_PATH="${_cmake_library_path}"
