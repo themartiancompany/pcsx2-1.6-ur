@@ -30,6 +30,7 @@
 _arch="$( \
   uname \
     -m)"
+_ml="lib32-"
 if [[ "${_arch}" == "i686" ]]; then
   _gcc="gcc"
 elif [[ "${_arch}" == "x86_64" ]]; then
@@ -44,11 +45,11 @@ pkgdesc='A Sony PlayStation 2 emulator'
 arch=(
   'i686'
   'x86_64'
-  'arm'
-  'armv7l'
-  'aarch64'
-  'armv6l'
-  'powerpc'
+  # 'arm'
+  # 'armv7l'
+  # 'aarch64'
+  # 'armv6l'
+  # 'powerpc'
   'pentium4'
 )
 url="http://www.${_pkg}.net"
@@ -67,7 +68,7 @@ _depends=(
   'portaudio'
   'sdl2'
   'soundtouch'
-  'wxgtk'
+  "wxwidgets3.0-gtk3"
 )
 # My girsh it really requires multilib.
 depends=()
@@ -103,8 +104,9 @@ options=(
 _http="https://github.com"
 _ns="${_Pkg}"
 _url="${_http}/${_ns}/${_pkg}"
+_tarname="${_pkg}-${pkgver}"
 source=(
-  "${_pkg}-${pkgver}.tar.gz::${_url}/archive/v${pkgver}.tar.gz"
+  "${_tarname}.tar.gz::${_url}/archive/v${pkgver}.tar.gz"
 )
 sha256sums=(
   'c09914020e494640f187f46d017f9d142ce2004af763b9a6c5c3a9ea09e5281c'
@@ -112,7 +114,7 @@ sha256sums=(
 
 prepare() {
   cd \
-    "${_pkg}-${pkgver}"
+    "${_tarname}"
   # Fix build with GCC 6
   # patch \
   #   -p1 \
@@ -136,7 +138,23 @@ build() {
   local \
     _cmake_opts=() \
     _plugin_dir \
-    _cmake_library_path
+    _cmake_library_path \
+    _wxwidgets_include \
+    _wxwidgets_lib \
+    _cxxflags=() \
+    _ldflags=()
+  _wxwidgets_include="$( \
+    _usr_get)/include/wx-3.0"
+  _wxwidgets_libs="$( \
+    _usr_get)/lib32/wxwidgets3.0"
+  _cxxflags+=(
+    $CXXFLAGS
+    -I"${_wxwidgets_include}"
+  )
+  _ldflags+=(
+    $LDFLAGS
+    -L"${_wxwidgets_libs}"
+  )
   _cmake_opts+=(
     -DCMAKE_BUILD_TYPE='Release'
     -DCMAKE_INSTALL_PREFIX='/usr'
@@ -147,6 +165,10 @@ build() {
     -DGLSL_API='TRUE'
     -DPACKAGE_MODE='TRUE'
     -DXDG_STD='TRUE'
+    -DCMAKE_CXX_FLAGS="${_cxxflags[*]}"
+    -DCMAKE_EXE_LINKER_FLAGS_INIT="${_ldflags[*]}"
+    -DCMAKE_MODULE_LINKER_FLAGS_INIT="${_ldflags[*]}"
+    -DCMAKE_SHARED_LINKER_FLAGS_INIT="${_ldflags[*]}"
   )
   _plugin_dir="/usr/lib/${_pkg}"
   _cmake_library_path="/usr/lib"
@@ -168,7 +190,7 @@ build() {
     -DPLUGIN_DIR="${_plugin_dir}"
   )
   cd \
-    "${_pkg}-${pkgver}"
+    "${_tarname}"
   if [[ -d build ]]; then
     rm \
       -rf \
@@ -178,14 +200,18 @@ build() {
     "build"
   cd \
     "build"
+  CXXFLAGS="${_cxxflags[*]}" \
+  LDFLAGS="${_ldflags[*]}" \
   cmake .. \
     "${_cmake_opts[@]}"
+  CXXFLAGS="${_cxxflags[*]}" \
+  LDFLAGS="${_ldflags[*]}" \
   make
 }
 
 package() {
   cd \
-    "${_pkg}-${pkgver}/build"
+    "${_tarname}/build"
   make \
     DESTDIR="${pkgdir}" \
     install
