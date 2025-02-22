@@ -115,6 +115,14 @@ sha256sums=(
 prepare() {
   cd \
     "${_tarname}"
+  sed \
+    "s%\"/usr/bin/wx-config32\"%\"/usr/bin/wx-config32-gtk3-3.0\"%" \
+    -i \
+    "cmake/SearchForStuff.cmake"
+  sed \
+    "s%\"/usr/bin/wx-config-3.0\"%\"/usr/bin/wx-config32-gtk3-3.0\"%" \
+    -i \
+    "cmake/SearchForStuff.cmake"
   # Fix build with GCC 6
   # patch \
   #   -p1 \
@@ -169,6 +177,7 @@ build() {
     -DCMAKE_EXE_LINKER_FLAGS_INIT="${_ldflags[*]}"
     -DCMAKE_MODULE_LINKER_FLAGS_INIT="${_ldflags[*]}"
     -DCMAKE_SHARED_LINKER_FLAGS_INIT="${_ldflags[*]}"
+    -DwxWidgets_CONFIG_EXECUTABLE="$(_usr_get)/bin/wx-config32-gtk3-3.0"
   )
   _plugin_dir="/usr/lib/${_pkg}"
   _cmake_library_path="/usr/lib"
