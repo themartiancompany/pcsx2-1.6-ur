@@ -201,6 +201,7 @@ build() {
     -DCMAKE_INSTALL_PREFIX='/usr'
     -DGAMEINDEX_DIR="/usr/share/${_pkg}"
     -DDISABLE_ADVANCE_SIMD='TRUE'
+    -DDOC_DIR_COMPILATION="/usr/share/doc/${_pkg}"
     -DEXTRA_PLUGINS='TRUE'
     -DREBUILD_SHADER='TRUE'
     -DGLSL_API='TRUE'
