@@ -36,6 +36,7 @@ if [[ "${_arch}" == "i686" ]]; then
 elif [[ "${_arch}" == "x86_64" ]]; then
   _gcc="gcc-multilib"
 fi
+_ccache="true"
 _gtk_ver="2"
 _pkg=pcsx2
 _Pkg="PCSX2"
@@ -92,6 +93,11 @@ makedepends=(
   'png++'
   "${_gcc}"
 )
+if [[ "${_ccache}" == "true" ]]; then
+  makedepends+=(
+    "ccache"
+  )
+fi
 _optdepends+=(
   'gtk-engines: GTK2 engines support'
   'gtk-engine-unico: Unico GTK2 engine support'
@@ -172,6 +178,8 @@ _usr_get() {
 
 build() {
   local \
+    _cc \
+    _cxx \
     _cmake_opts=() \
     _plugin_dir \
     _cmake_library_path \
@@ -183,6 +191,13 @@ build() {
     _lib32 \
     _gtk_libs \
     _gtk3_api
+  if [[ "${_ccache}" == "true" ]]; then
+    _cc="ccache gcc"
+    _cxx="ccache g++"
+  elif [[ "${_ccache}" == "false" ]]; then
+    _cc="gcc"
+    _cxx="g++"
+  fi
   _lib32="$( \
     _usr_get)/lib32"
   _wx_include="$( \
@@ -221,6 +236,8 @@ build() {
     _gtk3_api="TRUE"
   fi
   _cmake_opts+=(
+    -DCMAKE_C_COMPILER="${_cc}"
+    -DCMAKE_CXX_COMPILER="${_cxx}"
     -DCMAKE_BUILD_TYPE='Release'
     -DCMAKE_INSTALL_PREFIX='/usr'
     -DGAMEINDEX_DIR="/usr/share/${_pkg}"
@@ -273,10 +290,14 @@ build() {
     "build"
   cd \
     "build"
+  CC="${_cc}" \
+  CXX="${_cxx}" \
   CXXFLAGS="${_cxxflags[*]}" \
   LDFLAGS="${_ldflags[*]}" \
   cmake .. \
     "${_cmake_opts[@]}"
+  CC="${_cc}" \
+  CXX="${_cxx}" \
   CXXFLAGS="${_cxxflags[*]}" \
   LDFLAGS="${_ldflags[*]}" \
   make \
