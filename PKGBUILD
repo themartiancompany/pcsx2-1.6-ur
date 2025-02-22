@@ -41,7 +41,7 @@ _Pkg="PCSX2"
 pkgname="${_pkg}-1.6"
 pkgver=1.6.0
 pkgrel=1
-pkgdesc='A Sony PlayStation 2 emulator'
+pkgdesc='Sony PlayStation 2 emulator.'
 arch=(
   'i686'
   'x86_64'
@@ -64,6 +64,7 @@ _depends=(
   'libaio'
   'libcanberra'
   'libjpeg-turbo'
+  'libpcap'
   'nvidia-cg-toolkit'
   'portaudio'
   'sdl2'
