@@ -42,8 +42,40 @@ _warnings="false"
 _plugins_extra="false"
 _gl="false"
 _gtk_ver="2"
-_sse3="false"
-_avx="false"
+
+_instruction_set_support() {
+  local \
+    _instruction_set="${1}"
+  cat \
+    "/proc/cpuinfo" | \
+    grep \
+      "\b${_instruction_set}\b"
+}
+
+_sse4_supported="$( \
+  _instruction_set_support \
+    "sse4")"
+if [[ "${_sse4_supported}" != "" ]]; then
+  _sse4="true"
+elif [[ "${_sse4_supported}" == "" ]]; then
+  _sse4="false"
+fi
+_sse3_supported="$( \
+  _instruction_set_support \
+    "sse3")"
+if [[ "${_sse3_supported}" != "" ]]; then
+  _sse3="true"
+elif [[ "${_sse3_supported}" == "" ]]; then
+  _sse3="false"
+fi
+_avx_supported="$( \
+  _instruction_set_support \
+    "avx")"
+if [[ "${_avx_supported}" != "" ]]; then
+  _avx="true"
+elif [[ "${_avx_supported}" == "" ]]; then
+  _avx="false"
+fi
 _pkg=pcsx2
 _Pkg="PCSX2"
 _majver="1.6"
@@ -374,6 +406,9 @@ build() {
 }
 
 package() {
+  local \
+    _lib
+  _lib="${_usr}/lib32"
   cd \
     "${_tarname}/build"
   make \
@@ -395,6 +430,14 @@ package() {
   mv \
     "${pkgdir}/usr/share/applications/${_Pkg}.desktop" \
     "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+  if [[ "${_avx}" == "false" ]]; then
+    rm \
+      "${pkgdir}${_lib}/${_pkg}/libGSdx-AVX2.so"
+  fi
+  if [[ "${_sse4}" == "false" ]]; then
+    rm \
+      "${pkgdir}${_lib}/${_pkg}/libGSdx-SSE4.so"
+  fi
 }
 
 # vim: ts=2 sw=2 et:
