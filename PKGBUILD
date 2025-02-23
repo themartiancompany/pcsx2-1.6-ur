@@ -184,7 +184,7 @@ source=(
 )
 sha256sums=(
   'c09914020e494640f187f46d017f9d142ce2004af763b9a6c5c3a9ea09e5281c'
-  '6418e798ac3b0b6b5487a28e4acdcd82e9f96fcc25ebf7cbcd70a6c84b57dc32'
+  '7992ede7f004fd66da6c888980386cbc5af52308c77d45cd0a0da4dc445e1a07'
 )
 
 prepare() {
@@ -427,9 +427,11 @@ build() {
 
 package() {
   local \
-    _lib
-  _lib="$( \
-    _usr_get)/lib32"
+    _lib \
+    _usr
+  _usr="$( \
+    _usr_get)"
+  _lib="${_usr}/lib32"
   cd \
     "${_tarname}/build"
   make \
@@ -439,18 +441,18 @@ package() {
   install \
     -Dm755 \
     "${srcdir}/${pkgname}.sh" \
-    "${pkgdir}/usr/bin/${pkgname}"
+    "${pkgdir}${_usr}/bin/${pkgname}"
   sed \
     "s/Name=${_Pkg}/Name=${_Pkg} (${_majver})/" \
     -i \
-    "${pkgdir}/usr/share/applications/${_Pkg}.desktop"
+    "${pkgdir}${_usr}/share/applications/${_Pkg}.desktop"
   sed \
     "s/Exec=.*/Exec=${pkgname}/" \
     -i \
-    "${pkgdir}/usr/share/applications/${_Pkg}.desktop"
+    "${pkgdir}${_usr}/share/applications/${_Pkg}.desktop"
   mv \
-    "${pkgdir}/usr/share/applications/${_Pkg}.desktop" \
-    "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+    "${pkgdir}${_usr}/share/applications/${_Pkg}.desktop" \
+    "${pkgdir}${_usr}/share/applications/${pkgname}.desktop"
   # See https://github.com/PCSX2/pcsx2/issues/1935
   if [[ "${_avx}" == "false" ]]; then
     rm \
@@ -460,6 +462,13 @@ package() {
     rm \
       "${pkgdir}${_lib}/${_pkg}/libGSdx-SSE4.so"
   fi
+  mv \
+    "${pkgdir}${_usr}/bin/PCSX2" \
+    "${pkgdir}${_usr}/bin/PCSX2-${pkgver}"
+  ln \
+    -s \
+    "${_usr}/bin/PCSX2-${pkgver}"
+    "${pkgdir}${_usr}/bin/PCSX2"
 }
 
 # vim: ts=2 sw=2 et:
