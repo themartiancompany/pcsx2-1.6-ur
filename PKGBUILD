@@ -42,6 +42,19 @@ _warnings="false"
 _plugins_extra="false"
 _gl="false"
 _gtk_ver="2"
+# Setting this option to
+# true requires the user to input
+# sudo password to give the net9
+# plugin network capabilities.
+# Setting it to false has not been
+# tested, so be aware building
+# this progra using the Ur will
+# make the build last at least as
+# much as the sudo timeout
+# Be aware this option is only
+# needed if you need the emulated
+# PS2 to have a network card.
+_netdev="false"
 
 _instruction_set_support() {
   local \
@@ -252,7 +265,8 @@ build() {
     _gsdx_legacy \
     _extra_plugins \
     _disable_advance_simd \
-    _libs_find_opts=()
+    _builtin_dev \
+    _libs_find_opts=() 
   _cc="gcc"
   _cxx="g++"
   if [[ "${_ccache}" == "true" ]]; then
@@ -301,6 +315,11 @@ build() {
           "${_sse4}" == "true" ||
           "${_sse3}" == "true" ]]; then
     _disable_advance_simd="FALSE"
+  fi
+  if [[ "${_netdev}" == "false" ]]; then
+    _cmake_opts+=(
+      -DBUILTIN_DEV="FALSE"
+    )
   fi
   _cxxflags+=(
     $CXXFLAGS
@@ -386,6 +405,7 @@ build() {
     fi
   fi
   mkdir \
+    -p \
     "build"
   cd \
     "build"
@@ -408,7 +428,8 @@ build() {
 package() {
   local \
     _lib
-  _lib="${_usr}/lib32"
+  _lib="$( \
+    _usr_get)/lib32"
   cd \
     "${_tarname}/build"
   make \
@@ -430,6 +451,7 @@ package() {
   mv \
     "${pkgdir}/usr/share/applications/${_Pkg}.desktop" \
     "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+  # See https://github.com/PCSX2/pcsx2/issues/1935
   if [[ "${_avx}" == "false" ]]; then
     rm \
       "${pkgdir}${_lib}/${_pkg}/libGSdx-AVX2.so"
