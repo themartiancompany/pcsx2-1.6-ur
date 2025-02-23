@@ -199,7 +199,8 @@ build() {
     _ldflags=() \
     _lib32 \
     _gtk_libs \
-    _gtk3_api
+    _gtk3_api \
+    _libs_find_opts=()
   _cc="gcc"
   _cxx="g++"
   if [[ "${_ccache}" == "true" ]]; then
@@ -215,14 +216,27 @@ build() {
   _wx_libs="${_lib32}/wxwidgets3.0"
   _wx_gtk_unicode_include="${_wx_libs}/wx/include/gtk${_gtk_ver}-unicode-3.0"
   _gtk_libs="${_lib32}"
+  _libs_find_opts=(
+    -iname
+      "*.so"
+
+  )
+  if [[ "${_gtk_ver}" == "2" ]]; then
+    _gtk3_api="FALSE"
+    _libs_find_opts+=(
+      ! -iname
+        "*gtk3*"
+    )
+  elif [[ "${_gtk_ver}" == "3" ]]; then
+    _gtk3_api="TRUE"
+  fi
   _cxxflags+=(
     $CXXFLAGS
     -I"${_wx_include}"
     -I"${_wx_gtk_unicode_include}"
     $(find \
         "${_wx_libs}" \
-        -iname \
-          "*.so" \
+        "${_libs_find_opts[@]}" \
         -exec \
           echo \
             "-Wl,{}" \;)
@@ -245,14 +259,8 @@ build() {
     -L"${_gtk_libs}"
     $(find \
         "${_wx_libs}" \
-        -iname \
-          "*.so")
+        "${_libs_find_opts[@]}")
   )
-  if [[ "${_gtk_ver}" == "2" ]]; then
-    _gtk3_api="FALSE"
-  elif [[ "${_gtk_ver}" == "3" ]]; then
-    _gtk3_api="TRUE"
-  fi
   _cmake_opts+=(
     -DCMAKE_BUILD_TYPE='Release'
     -DCMAKE_INSTALL_PREFIX='/usr'
