@@ -112,6 +112,9 @@ for _optdepend in "${_optdepends[@]}"; do
     "${_optdepend}"
   )
 done
+provides=(
+  "${_pkg}=${pkgver}"
+)
 options=(
   '!emptydirs'
 )
@@ -125,7 +128,7 @@ source=(
 )
 sha256sums=(
   'c09914020e494640f187f46d017f9d142ce2004af763b9a6c5c3a9ea09e5281c'
-  'a3ccbe1d526c842446f5dacf75ccf468f5432b1cf7211f5643c881d1cdb71556'
+  '6418e798ac3b0b6b5487a28e4acdcd82e9f96fcc25ebf7cbcd70a6c84b57dc32'
 )
 
 prepare() {
@@ -341,6 +344,17 @@ package() {
     -Dm755 \
     "${srcdir}/${pkgname}" \
     "${pkgdir}/usr/bin/${pkgname}"
+  sed \
+    "s/Name=${_Pkg}/Name=${_Pkg} 1.6/" \
+    -i \
+    "${pkgdir}/usr/share/applications/${_Pkg}.desktop"
+  sed \
+    "s/Exec=.*/Exec=${pkgname}/" \
+    -i \
+    "${pkgdir}/usr/share/applications/${_Pkg}.desktop"
+  mv \
+    "${pkgdir}/usr/share/applications/${_Pkg}.desktop" \
+    "${pkgdir}/usr/share/applications/${pkgname}.desktop"
 }
 
 # vim: ts=2 sw=2 et:

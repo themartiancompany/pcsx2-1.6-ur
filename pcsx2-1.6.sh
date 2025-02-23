@@ -46,8 +46,13 @@ _launch() {
     "${_wx_libs[@]}"
     "${_wx_gtk2_libs[@]}"
   )
-  LD_PRELOAD="${_libs[*]}" \
-  PCSX2 
+  env \
+    GDK_BACKEND="x11" \
+    LD_PRELOAD="${_libs[*]}" \
+    __GL_THREADED_OPTIMIZATIONS=1 \
+    mesa_glthread="true" \
+    MESA_NO_ERROR=1 \
+    PCSX2
 }
 
 _launch $@
