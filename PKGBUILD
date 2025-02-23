@@ -343,7 +343,7 @@ package() {
     install
   install \
     -Dm755 \
-    "${srcdir}/${pkgname}" \
+    "${srcdir}/${pkgname}.sh" \
     "${pkgdir}/usr/bin/${pkgname}"
   sed \
     "s/Name=${_Pkg}/Name=${_Pkg} (${_majver})/" \
