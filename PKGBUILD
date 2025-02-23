@@ -238,7 +238,6 @@ build() {
   _libs_find_opts=(
     -iname
       "*.so"
-
   )
   if [[ "${_gtk_ver}" == "2" ]]; then
     _gtk3_api="FALSE"
