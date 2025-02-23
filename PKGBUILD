@@ -40,7 +40,7 @@ _clean="false"
 _ccache="true"
 _warnings="false"
 _plugins_extra="false"
-_gl="false"
+_gl="true"
 _gtk_ver="2"
 # Setting this option to
 # true requires the user to input
