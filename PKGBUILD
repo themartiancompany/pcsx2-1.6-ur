@@ -38,7 +38,7 @@ elif [[ "${_arch}" == "x86_64" ]]; then
 fi
 _ccache="true"
 _warnings="false"
-_plugins_extra="true"
+_plugins_extra="false"
 _gl="false"
 _gtk_ver="2"
 _sse3="false"
