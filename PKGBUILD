@@ -41,8 +41,9 @@ _warnings="false"
 _gtk_ver="2"
 _pkg=pcsx2
 _Pkg="PCSX2"
-pkgname="${_pkg}-1.6"
-pkgver=1.6.0
+_majver="1.6"
+pkgname="${_pkg}-${_majver}"
+pkgver="${_majver}.0"
 pkgrel=1
 pkgdesc='Sony PlayStation 2 emulator.'
 arch=(
@@ -345,7 +346,7 @@ package() {
     "${srcdir}/${pkgname}" \
     "${pkgdir}/usr/bin/${pkgname}"
   sed \
-    "s/Name=${_Pkg}/Name=${_Pkg} 1.6/" \
+    "s/Name=${_Pkg}/Name=${_Pkg} (${_majver})/" \
     -i \
     "${pkgdir}/usr/share/applications/${_Pkg}.desktop"
   sed \
