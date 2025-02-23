@@ -36,6 +36,7 @@ if [[ "${_arch}" == "i686" ]]; then
 elif [[ "${_arch}" == "x86_64" ]]; then
   _gcc="gcc-multilib"
 fi
+_clean="false"
 _ccache="true"
 _warnings="false"
 _plugins_extra="false"
@@ -345,15 +346,19 @@ build() {
   )
   cd \
     "${_tarname}"
-  if [[ -d build ]]; then
-    rm \
-      -rf \
-      "build"
+  if [[ "${_clean}" == "true" ]]; then
+    if [[ -d build ]]; then
+      rm \
+        -rf \
+        "build"
+    fi
   fi
   mkdir \
     "build"
   cd \
     "build"
+  export \
+    PATH="$PATH:${srcdir}/${_tarname}/plugins/zzogl-pg/opengl"
   CC="${_cc}" \
   CXX="${_cxx}" \
   CXXFLAGS="${_cxxflags[*]}" \
