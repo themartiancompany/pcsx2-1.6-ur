@@ -41,6 +41,8 @@ _warnings="false"
 _plugins_extra="true"
 _gl="false"
 _gtk_ver="2"
+_sse3="false"
+_avx="false"
 _pkg=pcsx2
 _Pkg="PCSX2"
 _majver="1.6"
@@ -216,6 +218,7 @@ build() {
     _glsl_api \
     _gsdx_legacy \
     _extra_plugins \
+    _disable_advance_simd \
     _libs_find_opts=()
   _cc="gcc"
   _cxx="g++"
@@ -258,6 +261,15 @@ build() {
   elif [[ "${_plugins_extra}" == "false" ]]; then
     _extra_plugins="FALSE"
   fi
+  if [[ "${_avx}" == "false" || \
+        "${_sse4}" == "false" ||
+        "${_sse3}" == "false" ]]; then
+    _disable_advance_simd="TRUE"
+  elif [[ "${_avx}" == "true" || \
+          "${_sse4}" == "true" ||
+          "${_sse3}" == "true" ]]; then
+    _disable_advance_simd="FALSE"
+  fi
   _cxxflags+=(
     $CXXFLAGS
     -I"${_wx_include}"
@@ -293,7 +305,7 @@ build() {
     -DCMAKE_BUILD_TYPE='Release'
     -DCMAKE_INSTALL_PREFIX='/usr'
     -DGAMEINDEX_DIR="/usr/share/${_pkg}"
-    -DDISABLE_ADVANCE_SIMD='TRUE'
+    -DDISABLE_ADVANCE_SIMD="${_disable_advance_simd}"
     -DDOC_DIR_COMPILATION="/usr/share/doc/${_pkg}"
     -DEXTRA_PLUGINS="${_extra_plugins}"
     -DREBUILD_SHADER='TRUE'
