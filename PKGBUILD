@@ -38,6 +38,8 @@ elif [[ "${_arch}" == "x86_64" ]]; then
 fi
 _ccache="true"
 _warnings="false"
+_plugins_extra="true"
+_gl="false"
 _gtk_ver="2"
 _pkg=pcsx2
 _Pkg="PCSX2"
@@ -75,6 +77,11 @@ _depends=(
   'soundtouch'
   "wxwidgets3.0-gtk2"
 )
+if [[ "${_gl}" == "true" ]]; then
+  _depends+=(
+    "libgl"
+  )
+fi
 if [[ "${_gtk_ver}" == "3" ]]; then
   _depends+=(
     "wxwidgets3.0-gtk3"
@@ -206,6 +213,9 @@ build() {
     _lib32 \
     _gtk_libs \
     _gtk3_api \
+    _glsl_api \
+    _gsdx_legacy \
+    _extra_plugins \
     _libs_find_opts=()
   _cc="gcc"
   _cxx="g++"
@@ -235,6 +245,18 @@ build() {
     )
   elif [[ "${_gtk_ver}" == "3" ]]; then
     _gtk3_api="TRUE"
+  fi
+  if [[ "${_gl}" == "true" ]]; then
+    _glsl_api="TRUE"
+    _gsdx_legacy="FALSE"
+  elif [[ "${_gl}" == "false" ]]; then
+    _glsl_api="FALSE"
+    _gsdx_legacy="TRUE"
+  fi
+  if [[ "${_plugins_extra}" == "true" ]]; then
+    _extra_plugins="TRUE"
+  elif [[ "${_plugins_extra}" == "false" ]]; then
+    _extra_plugins="FALSE"
   fi
   _cxxflags+=(
     $CXXFLAGS
@@ -273,9 +295,10 @@ build() {
     -DGAMEINDEX_DIR="/usr/share/${_pkg}"
     -DDISABLE_ADVANCE_SIMD='TRUE'
     -DDOC_DIR_COMPILATION="/usr/share/doc/${_pkg}"
-    -DEXTRA_PLUGINS='TRUE'
+    -DEXTRA_PLUGINS="${_extra_plugins}"
     -DREBUILD_SHADER='TRUE'
-    -DGLSL_API='TRUE'
+    -DGLSL_API="${_glsl_api}"
+    -DGSDX_LEGACY="${_gsdx_legacy}"
     -DPACKAGE_MODE='TRUE'
     -DXDG_STD='TRUE'
     -DEGL_API='FALSE'
