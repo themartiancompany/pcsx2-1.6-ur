@@ -121,9 +121,11 @@ _url="${_http}/${_ns}/${_pkg}"
 _tarname="${_pkg}-${pkgver}"
 source=(
   "${_tarname}.tar.gz::${_url}/archive/v${pkgver}.tar.gz"
+  "${pkgname}.sh"
 )
 sha256sums=(
   'c09914020e494640f187f46d017f9d142ce2004af763b9a6c5c3a9ea09e5281c'
+  'a3ccbe1d526c842446f5dacf75ccf468f5432b1cf7211f5643c881d1cdb71556'
 )
 
 prepare() {
@@ -335,6 +337,10 @@ package() {
     VERBOSE=1 \
     DESTDIR="${pkgdir}" \
     install
+  install \
+    -Dm755 \
+    "${srcdir}/${pkgname}" \
+    "${pkgdir}/usr/bin/${pkgname}"
 }
 
 # vim: ts=2 sw=2 et:
