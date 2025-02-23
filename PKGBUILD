@@ -467,7 +467,7 @@ package() {
     "${pkgdir}${_usr}/bin/PCSX2-${pkgver}"
   ln \
     -s \
-    "${_usr}/bin/PCSX2-${pkgver}"
+    "${_usr}/bin/PCSX2-${pkgver}" \
     "${pkgdir}${_usr}/bin/PCSX2"
 }
 
