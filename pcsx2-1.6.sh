@@ -23,7 +23,7 @@
 
 _launch() {
   local \
-    _pcsx2_opts=()
+    _pcsx2_opts=() \
     _wx
   _pcsx2_opts=(
     "$@"
