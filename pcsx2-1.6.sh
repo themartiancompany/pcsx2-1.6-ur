@@ -35,7 +35,7 @@ _launch() {
     __GL_THREADED_OPTIMIZATIONS=1 \
     mesa_glthread="true" \
     MESA_NO_ERROR=1 \
-    "PCSX2-1.6" \
+    "PCSX2-1.6.0" \
       "${_pcsx2_opts[@]}"
 }
 
