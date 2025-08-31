@@ -119,7 +119,7 @@ _Pkg="PCSX2"
 _majver="1.6"
 pkgname="${_pkg}-${_majver}"
 pkgver="${_majver}.0"
-pkgrel=1
+pkgrel=2
 pkgdesc='Sony PlayStation 2 emulator.'
 arch=(
   'i686'
