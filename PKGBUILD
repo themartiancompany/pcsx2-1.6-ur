@@ -37,6 +37,9 @@
 #   vEX
 #     <vex@niechift.com>
 
+if [[ ! -v "_git" ]]; then
+  _git="false"
+fi
 _evmfs_available="$( \
   command \
     -v \
@@ -196,17 +199,43 @@ provides=(
 options=(
   '!emptydirs'
 )
+source=(
+  "${pkgname}.sh"
+)
+sha256sums=(
+  '02042856a2f9feb3478dfe185b92b2c14b2c314488e1bef6e388120b31d8a7b4'
+)
+_sum='c09914020e494640f187f46d017f9d142ce2004af763b9a6c5c3a9ea09e5281c'
+_sig_sum="505a02724de85a5e9aab3cb7ac75bda8372340e21bd07cfc52e4852e8d8e145c"
+# Truocolo
+_evmfs_ns="0x6E5163fC4BFc1511Dbe06bB605cc14a3e462332b"
+_chain_id="100"
+_fs="0x69470b18f8b8b5f92b48f6199dcb147b4be96571"
+_evmfs_uri="evmfs://${_chain_id}/${_fs}/${_evmfs_ns}/${_sum}"
+_evmfs_sig_uri="evmfs://${_chain_id}/${_fs}/${_evmfs_ns}/${_sig_sum}"
 _http="https://github.com"
 _ns="${_Pkg}"
 _url="${_http}/${_ns}/${_pkg}"
 _tarname="${_pkg}-${pkgver}"
-source=(
-  "${_tarname}.tar.gz::${_url}/archive/v${pkgver}.tar.gz"
-  "${pkgname}.sh"
+_evmfs_src="${_tarname}.tar.gz::${_evmfs_uri}"
+if [[ "${_evmfs}" == "true" ]]; then
+  _evmfs_sig_src="${_tarname}.tar.gz.sig::${_evmfs_sig_uri}"
+  _src="${_evmfs_src}"
+  source+=(
+    "${_evmfs_sig_src}"
+  )
+  sha256sums+=(
+    "${_sig_sum}"
+  )
+if [[ "${_git}" == "false" ]]; then
+  _uri="${_url}/archive/v${pkgver}.tar.gz"
+  _src="${_tarname}.tar.gz:${_uri}"
+fi
+source+=(
+  "${_src}"
 )
-sha256sums=(
-  'c09914020e494640f187f46d017f9d142ce2004af763b9a6c5c3a9ea09e5281c'
-  '02042856a2f9feb3478dfe185b92b2c14b2c314488e1bef6e388120b31d8a7b4'
+sha256sums+=(
+  "${_sum}"
 )
 
 prepare() {
