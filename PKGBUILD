@@ -227,7 +227,7 @@ if [[ "${_evmfs}" == "true" ]]; then
   sha256sums+=(
     "${_sig_sum}"
   )
-if [[ "${_git}" == "false" ]]; then
+elif [[ "${_git}" == "false" ]]; then
   _uri="${_url}/archive/v${pkgver}.tar.gz"
   _src="${_tarname}.tar.gz:${_uri}"
 fi
